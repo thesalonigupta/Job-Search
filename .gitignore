@@ -1,0 +1,5 @@
+# Dashboard exports hold personal data (contacts, notes, calendar). Keep them off GitHub.
+jobhunt-export*.json
+data/*.json
+!data/template.json
+.DS_Store

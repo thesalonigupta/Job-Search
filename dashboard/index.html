@@ -1,0 +1,705 @@
+<!doctype html><html><head><meta charset=utf-8><title>Job Hunt Dashboard</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F4F3F7;--surface:#FFFFFF;--surface-2:#EDEBF2;--ink:#1B1726;--muted:#625D72;--line:#DEDAE7;
+  --accent:#57068C;--accent-ink:#FFFFFF;--accent-soft:#F0E7F8;
+  --danger:#B42318;--danger-soft:#FDECEA;--warn:#955305;--warn-soft:#FCF1DE;
+  --ok:#1D7447;--ok-soft:#E3F3EA;--info:#1F5FA8;--info-soft:#E5EDF8;
+  --radius:10px;--sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#131119;--surface:#1C1925;--surface-2:#27232F;--ink:#ECE9F3;--muted:#A49EB4;--line:#34303F;
+  --accent:#C49DF2;--accent-ink:#1A1026;--accent-soft:#2E2442;
+  --danger:#FF8C7C;--danger-soft:#3B1C1A;--warn:#F2B863;--warn-soft:#352812;
+  --ok:#6FD4A0;--ok-soft:#153020;--info:#8FB9F3;--info-soft:#172639;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#131119;--surface:#1C1925;--surface-2:#27232F;--ink:#ECE9F3;--muted:#A49EB4;--line:#34303F;
+  --accent:#C49DF2;--accent-ink:#1A1026;--accent-soft:#2E2442;
+  --danger:#FF8C7C;--danger-soft:#3B1C1A;--warn:#F2B863;--warn-soft:#352812;
+  --ok:#6FD4A0;--ok-soft:#153020;--info:#8FB9F3;--info-soft:#172639;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1040px;margin:0 auto}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 24px;padding-block:28px 14px}
+header.top h1{margin:0;font-size:1.65rem;font-weight:700;letter-spacing:-.015em;text-wrap:balance}
+header.top .sub{margin:2px 0 0;color:var(--muted);font-size:.92rem}
+header.top .today{color:var(--muted);font-size:.85rem}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-bottom:22px}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:none;border:0;background:none;padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:600;font-size:.92rem;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs .n{font-family:var(--mono);font-weight:400;font-size:.78rem;color:var(--muted);margin-left:4px}
+
+.banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between;padding:12px 16px;border-radius:var(--radius);margin-bottom:18px;border:1px solid var(--line);background:var(--surface)}
+.banner.bad{background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger) 35%,transparent);color:var(--danger)}
+.banner strong{font-weight:700}
+.banner .meta{color:var(--muted);font-size:.88rem}
+.banner.bad .meta{color:inherit;opacity:.85}
+
+.sec-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sec-head h2{margin:0;font-size:1.15rem;font-weight:700}
+h3.label{margin:26px 0 10px;font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h3.label:first-child{margin-top:0}
+h3.label .hint{text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.stat .k{font-size:.8rem;color:var(--muted)}
+.stat .v{font-family:var(--mono);font-size:1.9rem;font-weight:500;line-height:1.15;margin-top:2px}
+.stat.flag .v{color:var(--warn)}
+.statusbar{display:flex;flex-wrap:wrap;gap:8px}
+.statusbar button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px 5px 6px;cursor:pointer}
+.statusbar .c{font-family:var(--mono);font-size:.9rem}
+
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:12px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row.dim{opacity:.55}
+.row .title{font-weight:600;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--ink)}
+.row .title:hover{color:var(--accent)}
+.row .title .role{font-weight:400;color:var(--muted)}
+.row .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:.86rem}
+.row .notes{grid-column:1/-1;font-size:.88rem;white-space:pre-wrap}
+.row .side{display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px;justify-self:end;justify-content:flex-end}
+.row .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.empty{padding:22px 16px;color:var(--muted);text-align:center}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--surface-2);color:var(--muted)}
+.pill.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-Saved{background:var(--surface-2);color:var(--ink)}
+.s-Applied{background:var(--info-soft);color:var(--info)}
+.s-Interviewing{background:var(--accent-soft);color:var(--accent)}
+.s-Offer{background:var(--ok-soft);color:var(--ok)}
+.s-Rejected{background:var(--danger-soft);color:var(--danger)}
+.s-Closed,.s-Archived{background:var(--surface-2);color:var(--muted);text-decoration:line-through}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.info{background:var(--info-soft);color:var(--info)}
+.pill.new{background:var(--accent);color:var(--accent-ink)}
+.pill.type{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.85rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .c{font-family:var(--mono);font-size:.78rem;opacity:.7;margin-left:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:5px 12px;font-size:.85rem;cursor:pointer;color:var(--muted);font-weight:600}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-weight:600;font-size:.88rem;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{background:var(--danger);color:var(--surface);border-color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.qa{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:3px 10px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--ink)}
+.qa:hover{border-color:var(--accent);color:var(--accent)}
+.qa.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qa.go:hover{color:var(--accent-ink);filter:brightness(1.08)}
+.qa.quiet{color:var(--muted)}
+.qa:disabled{opacity:.5;cursor:wait}
+.spacer{flex:1}
+label.toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);cursor:pointer}
+input.search{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:.88rem;min-width:0;width:220px;max-width:100%}
+
+.dl-date{font-family:var(--mono);font-size:.9rem;font-variant-numeric:tabular-nums}
+.when{font-size:.8rem;color:var(--muted);font-family:var(--mono)}
+.when.soon{color:var(--warn);font-weight:500}
+.when.urgent{color:var(--danger);font-weight:500}
+.dl-row{grid-template-columns:7.2rem 1fr auto}
+.dl-row .meta,.dl-row .notes{grid-column:2/-1}
+@media (max-width:560px){.dl-row{grid-template-columns:1fr auto}.dl-row .meta,.dl-row .notes{grid-column:1/-1}}
+
+.funnel{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:6px}
+.funnel a{display:block;padding:12px 16px;text-decoration:none;color:var(--ink);border-left:1px solid var(--line)}
+.funnel a:first-child{border-left:0}
+.funnel .k{font-size:.8rem;color:var(--muted)}
+.funnel .v{font-family:var(--mono);font-size:1.6rem;font-weight:500;line-height:1.2}
+.funnel .rate{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+@media (max-width:480px){.funnel{grid-template-columns:1fr}.funnel a{border-left:0;border-top:1px solid var(--line)}.funnel a:first-child{border-top:0}}
+
+.org-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+@media (max-width:360px){.org-grid{grid-template-columns:1fr}}
+.org{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.org.dim{opacity:.55}
+.org .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.org .kv{font-size:.87rem}
+.org .kv b{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.org .ft{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:auto;padding-top:6px;font-size:.85rem}
+
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+dialog::backdrop{background:rgb(10 8 16 / .45)}
+dialog form{display:flex;flex-direction:column;max-height:calc(100vh - 50px)}
+dialog .dh{padding:16px 20px 8px;font-weight:700;font-size:1.05rem}
+dialog .db{padding:4px 20px 12px;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+dialog .df{padding:12px 20px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.field{display:flex;flex-direction:column;gap:4px;grid-column:1/-1}
+.field.half{grid-column:auto}
+@media (max-width:520px){.field.half{grid-column:1/-1}}
+.field label{font-size:.8rem;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.field textarea{min-height:70px;resize:vertical}
+.field.check{flex-direction:row;align-items:center;gap:8px}
+.field.check input{width:auto}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:8px;font-size:.9rem;z-index:20;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 32px)}
+.toast button{background:none;border:0;color:var(--bg);font-weight:700;text-decoration:underline;cursor:pointer;padding:2px 8px}
+.toast button[hidden]{display:none}
+.note{color:var(--muted);font-size:.85rem}
+.alert{padding:12px 16px;border-radius:var(--radius);background:var(--warn-soft);color:var(--warn);margin-bottom:16px}
+@media (prefers-reduced-motion:no-preference){.row,.org{transition:background .15s}}
+
+/* calendar */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 8px 10px;min-height:92px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.day .dh2{display:flex;justify-content:space-between;align-items:baseline;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.day .dn{font-family:var(--mono);font-size:1rem;color:var(--ink);letter-spacing:0}
+.ev{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--kc,var(--muted));background:color-mix(in srgb,var(--kc,var(--muted)) 10%,transparent);border-radius:4px;padding:2px 5px;font-size:.74rem;line-height:1.3;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.ev .t{font-family:var(--mono);color:var(--muted);margin-right:3px}
+.more{font-size:.72rem;color:var(--muted)}
+.k-int{--kc:#C2410C}.k-chat{--kc:#0E7C66}.k-meet{--kc:#1F5FA8}.k-rec{--kc:#7C3AED}.k-asg{--kc:#B45309}.k-club{--kc:#64748B}.k-per{--kc:#BE185D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .k-int{--kc:#FB923C}:root:not([data-theme="light"]) .k-chat{--kc:#34D399}:root:not([data-theme="light"]) .k-meet{--kc:#8FB9F3}:root:not([data-theme="light"]) .k-rec{--kc:#C4B5FD}:root:not([data-theme="light"]) .k-asg{--kc:#FBBF24}:root:not([data-theme="light"]) .k-club{--kc:#94A3B8}:root:not([data-theme="light"]) .k-per{--kc:#F9A8D4}}
+:root[data-theme="dark"] .k-int{--kc:#FB923C}:root[data-theme="dark"] .k-chat{--kc:#34D399}:root[data-theme="dark"] .k-meet{--kc:#8FB9F3}:root[data-theme="dark"] .k-rec{--kc:#C4B5FD}:root[data-theme="dark"] .k-asg{--kc:#FBBF24}:root[data-theme="dark"] .k-club{--kc:#94A3B8}:root[data-theme="dark"] .k-per{--kc:#F9A8D4}
+.kdot{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--kc);vertical-align:middle}
+.ag-row{grid-template-columns:6.2rem 1fr auto}
+.ag-row .meta,.ag-row .notes{grid-column:2/-1}
+.ag-time{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.ag-day{padding:8px 16px;background:var(--surface-2);font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line)}
+.ag-day:first-child{border-top:0}
+.ag-day.is-today{color:var(--accent)}
+@media (max-width:640px){.week{grid-template-columns:1fr}.day{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:center}.day .dh2{width:4.2rem;flex:none;flex-direction:column;justify-content:flex-start;gap:0;align-items:flex-start}.day .ev{width:auto;max-width:100%}.ag-row{grid-template-columns:1fr auto}.ag-row .meta,.ag-row .notes{grid-column:1/-1}}
+
+/* to-do */
+.td-row{grid-template-columns:auto 1fr auto;align-items:start}
+.td-row .meta,.td-row .notes{grid-column:2/-1}
+.td-check{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+.td-row.done .title{text-decoration:line-through;color:var(--muted)}
+.pri-High{background:var(--danger-soft);color:var(--danger)}
+.pri-Medium{background:var(--warn-soft);color:var(--warn)}
+.pri-Low{background:var(--surface-2);color:var(--muted)}
+.quickadd{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.quickadd input{flex:1 1 220px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+.quickadd input[type=date]{flex:0 0 auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.local-tools{display:flex;gap:6px;margin-top:6px;justify-content:flex-end}
+.local-tools label.qa{display:inline-block}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Job Hunt Dashboard</h1>
+      <p class="sub">NYU Politics + Data Science, Class of 2027 · post-grad search + spring 2027 internships</p>
+    </div>
+    <div>
+      <div class="today mono" id="today"></div>
+      <div class="local-tools" id="local-tools" hidden>
+        <button type="button" class="qa" id="export-json">Export data</button>
+        <label class="qa" for="import-json">Import data</label>
+        <input type="file" id="import-json" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="overview">Overview</button>
+    <button role="tab" data-tab="todos">To-Do<span class="n" id="n-todos"></span></button>
+    <button role="tab" data-tab="events">Calendar<span class="n" id="n-events"></span></button>
+    <button role="tab" data-tab="applications">Jobs<span class="n" id="n-applications"></span></button>
+    <button role="tab" data-tab="outreach">Outreach<span class="n" id="n-outreach"></span></button>
+    <button role="tab" data-tab="orgs">Target Orgs<span class="n" id="n-orgs"></span></button>
+    <button role="tab" data-tab="resources">Resources &amp; Events<span class="n" id="n-resources"></span></button>
+    <button role="tab" data-tab="deadlines">Deadlines<span class="n" id="n-deadlines"></span></button>
+    <button role="tab" data-tab="certs">Skills &amp; Certs<span class="n" id="n-certs"></span></button>
+  </nav>
+
+  <div id="alert" class="alert" hidden></div>
+
+  <section id="p-overview" data-panel="overview"></section>
+  <section id="p-todos" data-panel="todos" hidden></section>
+  <section id="p-events" data-panel="events" hidden></section>
+  <section id="p-applications" data-panel="applications" hidden></section>
+  <section id="p-outreach" data-panel="outreach" hidden></section>
+  <section id="p-orgs" data-panel="orgs" hidden></section>
+  <section id="p-resources" data-panel="resources" hidden></section>
+  <section id="p-deadlines" data-panel="deadlines" hidden></section>
+  <section id="p-certs" data-panel="certs" hidden></section>
+</div>
+
+<dialog id="dlg"><form id="dlg-form" novalidate>
+  <div class="dh" id="dlg-title"></div>
+  <div class="db" id="dlg-body"></div>
+  <div class="df">
+    <span class="note spacer" id="dlg-note"></span>
+    <button type="button" class="btn" id="dlg-cancel">Cancel</button>
+    <button type="submit" class="btn primary" id="dlg-save">Save</button>
+  </div>
+</form></dialog>
+<div class="toast" id="toast" hidden><span id="toast-msg"></span><button type="button" id="toast-undo" hidden>Undo</button></div>
+
+<script>
+(function(){
+const STATUSES=["Saved","Applied","Interviewing","Offer","Rejected","Closed"];
+const JOB_TYPES=["Full-time","Internship","Fellowship"];
+const STAGES=["Request sent","Accepted","Replied"];
+const TODO_STATUSES=["To do","In progress","Done"];
+const EVENT_KINDS=["Interview","Coffee chat","Meeting","Recruiting event","Assignment","Club","Personal"];
+const KIND_CLS={"Interview":"k-int","Coffee chat":"k-chat","Meeting":"k-meet","Recruiting event":"k-rec","Assignment":"k-asg","Club":"k-club","Personal":"k-per"};
+const SCHEMA={
+  applications:{one:"job",fields:[
+    ["org","Organization","text",{req:1,half:1}],["role","Role","text",{req:1,half:1}],
+    ["job_type","Job type","select",{opts:JOB_TYPES,half:1}],["location","Location","text",{half:1}],
+    ["source","Source","select",{opts:["","LinkedIn","Handshake","company site","referral"],half:1}],["status","Status","select",{opts:STATUSES,half:1}],
+    ["date_applied","Date applied","date",{half:1}],["last_update","Last update","date",{half:1}],
+    ["deadline","Apply by","date",{half:1}],["pinned","Pin to top of Jobs","checkbox",{half:1}],
+    ["link","Link","url"],["notes","Notes","textarea"]]},
+  outreach:{one:"contact",fields:[
+    ["name","Name","text",{req:1,half:1}],["org","Organization","text",{half:1}],
+    ["role_title","Role / title","text",{half:1}],["channel","Channel","select",{opts:["","LinkedIn","email","Handshake","in person"],half:1}],
+    ["stage","Stage","select",{opts:STAGES,half:1}],["date_contacted","Date contacted","date",{half:1}],
+    ["last_contact","Last contact","date",{half:1}],["next_step","Next step","textarea"],["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  orgs:{one:"target org",fields:[
+    ["org","Organization","text",{req:1,half:1}],["tier","Tier","select",{opts:["1","2","pipeline"],half:1}],
+    ["why_it_fits","Why it fits","textarea"],["current_status","Current status","textarea"],
+    ["check_back","Check back","text",{half:1}],["careers_url","Careers URL","url",{half:1}],
+    ["new_posting_flag","New posting","checkbox"],["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  resources:{one:"resource",fields:[
+    ["name","Name","text",{req:1}],["type","Type","select",{opts:["job board","newsletter","event","program"],half:1}],
+    ["date","Date (events)","date",{half:1}],["url","URL","url"],["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  certs:{one:"certification",fields:[
+    ["name","Name","text",{req:1}],["provider","Provider","text",{half:1}],["status","Status","select",{opts:["Not started","In progress","Completed"],half:1}],
+    ["progress","Progress","text",{half:1}],["target_date","Target finish","date",{half:1}],["url","URL","url"],["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  deadlines:{one:"deadline",fields:[
+    ["item","Item","text",{req:1}],["date","Date","date",{req:1,half:1}],["type","Type","select",{opts:["application","scholarship","event"],half:1}],
+    ["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  todos:{one:"to-do",fields:[
+    ["task","Task","text",{req:1}],["due","Due","date",{half:1}],["priority","Priority","select",{opts:["High","Medium","Low"],half:1}],
+    ["status","Status","select",{opts:TODO_STATUSES,half:1}],["related","Related to","text",{half:1}],
+    ["notes","Notes","textarea"],["archived","Archived","checkbox"]]},
+  events:{one:"calendar item",fields:[
+    ["title","Title","text",{req:1}],["date","Date","date",{req:1,half:1}],["kind","Kind","select",{opts:EVENT_KINDS,half:1}],
+    ["start","Start","time",{half:1}],["end","End","time",{half:1}],
+    ["where","Where / link","text",{half:1}],["calendar","Calendar","select",{opts:["NYU","Personal","Assignment tracker","Dashboard only"],half:1}],
+    ["notes","Notes","textarea"],["archived","Archived","checkbox"]]}
+};
+const COLS=Object.keys(SCHEMA);
+const state={applications:[],outreach:[],orgs:[],resources:[],deadlines:[],certs:[],todos:[],events:[],settings:null};
+const loaded={};
+const ui={tab:"overview",appFilter:"Saved",appType:"All",appSortDesc:true,outQuery:"",todoShowDone:false,calKinds:null,showArch:{outreach:false,orgs:false,resources:false,deadlines:false,certs:false,todos:false,events:false}};
+let db=null,readOnly=false,unavailable=false;
+
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York"}).format(new Date());
+const toDay=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?Date.UTC(+m[1],+m[2]-1,+m[3])/864e5:null};
+const diff=(a,b)=>{const x=toDay(a),y=toDay(b);return x==null||y==null?null:y-x};
+const plusDays=(s,n)=>new Date((toDay(s)+n)*864e5).toISOString().slice(0,10);
+const safeUrl=u=>/^https?:\/\//i.test(u||"")?u:"";
+const link=(u,t)=>safeUrl(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t||"Link")} ↗</a>`:"";
+function whenLabel(d){const n=diff(today(),d);if(n==null)return "";if(n===0)return "today";if(n===1)return "tomorrow";if(n>0)return `in ${n} days`;if(n===-1)return "yesterday";return `${-n} days ago`}
+function whenClass(d){const n=diff(today(),d);if(n==null||n<0)return "";return n<=7?"urgent":n<=30?"soon":""}
+const active=(col)=>state[col].filter(r=>!r.archived);
+const jobType=a=>a.job_type||(/\bintern(ship)?\b|co-op/i.test(a.role||"")?"Internship":"Full-time");
+const stageOf=o=>STAGES.includes(o.stage)?o.stage:(o.replied==="yes"?"Replied":"Request sent");
+function needsFollowUp(r){if(r.archived||stageOf(r)!=="Accepted"||!(r.last_contact||r.date_contacted))return false;const n=diff(r.last_contact||r.date_contacted,today());return n!=null&&n>=7}
+function staleRequest(r){if(r.archived||stageOf(r)!=="Request sent"||!r.date_contacted)return false;const n=diff(r.date_contacted,today());return n!=null&&n>21}
+function upcoming(){const t=today();return active("deadlines").filter(d=>d.date&&d.date>=t).sort((a,b)=>a.date.localeCompare(b.date))}
+const canWrite=()=>!!db&&!readOnly&&!unavailable;
+
+// ---------- tabs ----------
+function setTab(t,push){ui.tab=t;document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));document.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==t);if(push){try{history.replaceState(null,"","#"+t)}catch(e){}}}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(b){setTab(b.dataset.tab,true);window.scrollTo({top:0})}});
+const h=(location.hash||"").slice(1);setTab(["overview",...COLS].includes(h)?h:"overview");
+
+// ---------- render ----------
+function addBtn(col){return canWrite()?`<button class="btn primary" data-add="${col}">Add ${SCHEMA[col].one}</button>`:""}
+function archToggle(col){return `<label class="toggle"><input type="checkbox" id="arch-${col}" data-arch="${col}" ${ui.showArch[col]?"checked":""}> Show archived</label>`}
+function loading(col){return !loaded[col]&&!unavailable?`<div class="list"><div class="empty">Loading…</div></div>`:null}
+
+function renderOverview(){
+  const s=state.settings||{};const last=s.last_reply_check||"";const age=last?diff(last,today()):null;
+  const overdue=state.settings!==null&&(!last||age>7);
+  const counts=STATUSES.map(st=>[st,state.applications.filter(a=>(a.status||"Saved")===st).length]);
+  const fu=state.outreach.filter(needsFollowUp);const up=upcoming();const t=today();const in30=up.filter(d=>d.date<=plusDays(t,30));
+  const saved=state.applications.filter(a=>(a.status||"Saved")==="Saved");
+  const out=active("outreach");const sc=STAGES.map(st=>out.filter(o=>stageOf(o)===st).length);
+  let html="";
+  html+=`<div class="banner ${overdue?"bad":""}" role="${overdue?"alert":"status"}">
+    <div>${overdue?`<strong>LinkedIn/Handshake reply check overdue</strong><br>`:`<strong>Reply check up to date</strong><br>`}
+    <span class="meta">Last check: <span class="mono">${last?esc(last)+" ("+whenLabel(last)+")":"never"}</span></span></div>
+    ${canWrite()?`<button class="btn ${overdue?"danger":""}" id="mark-check">Mark checked today</button>`:""}</div>`;
+  html+=overviewWidgets();
+  html+=`<h3 class="label">At a glance</h3><div class="stats">
+    <div class="stat ${saved.length?"flag":""}"><div class="k">Saved, not yet applied</div><div class="v">${saved.length}</div></div>
+    <div class="stat"><div class="k">Applications in play</div><div class="v">${state.applications.filter(a=>["Applied","Interviewing","Offer"].includes(a.status)).length}</div></div>
+    <div class="stat ${fu.length?"flag":""}"><div class="k">Accepted, needs a nudge</div><div class="v">${fu.length}</div></div>
+    <div class="stat ${in30.length?"flag":""}"><div class="k">Deadlines in next 30 days</div><div class="v">${in30.length}</div></div></div>`;
+  html+=`<h3 class="label">Jobs by status</h3><div class="statusbar">${counts.map(([st,c])=>`<button data-goto-status="${st}"><span class="pill dot s-${st}">${st}</span><span class="c">${c}</span></button>`).join("")}</div>`;
+  html+=`<h3 class="label">Outreach funnel</h3>${funnel(sc)}`;
+  html+=`<h3 class="label">Next 5 deadlines</h3><div class="list">${up.slice(0,5).map(dlRow).join("")||`<div class="empty">No upcoming deadlines.</div>`}</div>`;
+  if(fu.length)html+=`<h3 class="label">Nudge these contacts<span class="hint">accepted 7+ days ago, no reply</span></h3><div class="list">${fu.map(outRow).join("")}</div>`;
+  $("#p-overview").innerHTML=html;
+}
+function funnel(sc){
+  const [sent,acc,rep]=sc;const total=sent+acc+rep;
+  const pct=(n)=>total?Math.round(n/total*100)+"%":"–";
+  return `<div class="funnel">
+    <a href="#outreach" data-goto-stage="Request sent"><div class="k">Requests sent, pending</div><div class="v">${sent}</div><div class="rate">${pct(sent)} of ${total}</div></a>
+    <a href="#outreach" data-goto-stage="Accepted"><div class="k">Accepted, no reply yet</div><div class="v">${acc}</div><div class="rate">${pct(acc)} of ${total}</div></a>
+    <a href="#outreach" data-goto-stage="Replied"><div class="k">Replied</div><div class="v">${rep}</div><div class="rate">${pct(rep)} of ${total}</div></a></div>`;
+}
+
+const APP_ACTIONS={
+  Saved:[["Applied","Applied","go"],["Closed","Not applying","quiet"]],
+  Applied:[["Interviewing","Interviewing",""],["Rejected","Rejected","quiet"],["Closed","Withdrew","quiet"]],
+  Interviewing:[["Offer","Offer","go"],["Rejected","Rejected","quiet"]],
+  Offer:[],Rejected:[["Saved","Reopen","quiet"]],Closed:[["Saved","Reopen","quiet"]]
+};
+function appRow(a){
+  const st=a.status||"Saved";const acts=canWrite()?(APP_ACTIONS[st]||[]):[];
+  return `<div class="row ${["Rejected","Closed"].includes(st)?"dim":""}">
+    <button class="title" data-edit="applications:${esc(a.id)}">${esc(a.org)} <span class="role">· ${esc(a.role)}</span></button>
+    <div class="side">${a.pinned?`<span class="pill new">Pinned</span>`:""}${a.deadline&&["Saved","Applied"].includes(st)&&a.deadline>=today()&&st==="Saved"?`<span class="pill ${diff(today(),a.deadline)<=7?"s-Rejected":"warn"}">Due ${whenLabel(a.deadline)}</span>`:""}<span class="pill type">${esc(jobType(a))}</span><span class="pill dot s-${esc(st)}">${esc(st)}</span></div>
+    <div class="meta">${a.location?`<span>${esc(a.location)}</span>`:""}${a.source?`<span>via ${esc(a.source)}</span>`:""}${a.date_applied?`<span>Applied <span class="mono">${esc(a.date_applied)}</span></span>`:""}${a.deadline?`<span>Apply by <span class="mono">${esc(a.deadline)}</span></span>`:""}${a.last_update?`<span>Updated <span class="mono">${esc(a.last_update)}</span></span>`:""}${link(a.link,"Posting")}</div>
+    ${a.notes?`<div class="notes">${esc(a.notes)}</div>`:""}
+    ${acts.length?`<div class="acts">${acts.map(([to,label,cls])=>`<button class="qa ${cls}" data-move="${esc(a.id)}" data-to="${to}">${label==="Applied"?"✓ Applied":label}</button>`).join("")}</div>`:""}</div>`;
+}
+function renderApplications(){
+  const L=loading("applications");
+  const all=state.applications.filter(a=>ui.appType==="All"||jobType(a)===ui.appType);
+  const counts={All:all.filter(a=>a.status!=="Closed").length};STATUSES.forEach(s=>counts[s]=all.filter(a=>(a.status||"Saved")===s).length);
+  let rows=ui.appFilter==="All"?all.filter(a=>a.status!=="Closed"):all.filter(a=>(a.status||"Saved")===ui.appFilter);
+  const urgent=a=>(a.status||"Saved")==="Saved"&&a.deadline&&a.deadline>=today();
+  rows.sort((a,b)=>{const p=(!!b.pinned-!!a.pinned);if(p)return p;const ua=urgent(a),ub=urgent(b);if(ua!==ub)return ub-ua;if(ua&&ub)return a.deadline.localeCompare(b.deadline);const x=(a.last_update||""),y=(b.last_update||"");const c=x.localeCompare(y)||(a.org||"").localeCompare(b.org||"");return ui.appSortDesc?-c:c});
+  const tc=t=>state.applications.filter(a=>(t==="All"||jobType(a)===t)&&a.status!=="Closed").length;
+  const hint={Saved:"Tap ✓ Applied once you submit, or Not applying to move it to Closed.",Closed:"Jobs you passed on or that closed. Reopen puts one back in Saved."}[ui.appFilter]||"";
+  $("#p-applications").innerHTML=`<div class="sec-head"><h2>Jobs</h2>${addBtn("applications")}</div>
+    <div class="toolbar"><div class="seg" role="group" aria-label="Job type">${["All","Full-time","Internship","Fellowship"].map(t=>`<button data-type="${t}" aria-pressed="${ui.appType===t}">${t==="Internship"?"Internships":t==="Fellowship"?"Fellowships":t} <span class="mono">${tc(t)}</span></button>`).join("")}</div></div>
+    <div class="toolbar">${["All",...STATUSES].map(s=>`<button class="chip" data-filter="${s}" aria-pressed="${ui.appFilter===s}">${s}<span class="c">${counts[s]}</span></button>`).join("")}
+    <span class="spacer"></span><button class="btn" id="sort-toggle">Last update ${ui.appSortDesc?"↓ newest":"↑ oldest"}</button></div>
+    ${hint?`<p class="note" style="margin:0 0 10px">${hint}</p>`:""}
+    ${L||`<div class="list">${rows.map(appRow).join("")||`<div class="empty">Nothing here with this status${ui.appType!=="All"?" and type":""}.</div>`}</div>`}`;
+}
+
+const OUT_ACTIONS={"Request sent":[["Accepted","Accepted","go"],["Replied","Replied",""]],"Accepted":[["Replied","Replied","go"]],"Replied":[]};
+function outRow(o){
+  const st=stageOf(o);const fu=needsFollowUp(o);const stale=staleRequest(o);const acts=canWrite()&&!o.archived?(OUT_ACTIONS[st]||[]):[];
+  return `<div class="row ${o.archived?"dim":""}">
+    <button class="title" data-edit="outreach:${esc(o.id)}">${esc(o.name)} <span class="role">· ${esc([o.role_title,o.org].filter(Boolean).join(", "))}</span></button>
+    <div class="side">${fu?`<span class="pill warn">Nudge</span>`:""}${stale?`<span class="pill warn">3+ wks pending</span>`:""}<span class="pill ${st==="Replied"?"ok":st==="Accepted"?"info":""}">${st}</span>${o.archived?`<span class="pill s-Archived">Archived</span>`:""}</div>
+    <div class="meta">${o.channel?`<span>${esc(o.channel)}</span>`:`<span>Channel TBD</span>`}${o.date_contacted?`<span>Contacted <span class="mono">${esc(o.date_contacted)}</span></span>`:`<span>Not contacted yet</span>`}${o.last_contact&&o.last_contact!==o.date_contacted?`<span>Last contact <span class="mono">${esc(o.last_contact)}</span></span>`:""}</div>
+    ${o.next_step?`<div class="notes"><b>Next:</b> ${esc(o.next_step)}</div>`:""}${o.notes?`<div class="notes">${esc(o.notes)}</div>`:""}
+    ${acts.length?`<div class="acts">${acts.map(([to,label,cls])=>`<button class="qa ${cls}" data-stage-move="${esc(o.id)}" data-to="${to}">Mark ${label}</button>`).join("")}</div>`:""}</div>`;
+}
+function renderOutreach(){
+  const L=loading("outreach");const q=ui.outQuery.trim().toLowerCase();
+  let rows=state.outreach.filter(o=>ui.showArch.outreach||!o.archived).filter(o=>!q||[o.name,o.org,o.role_title].join(" ").toLowerCase().includes(q));
+  const by=(a,b)=>(needsFollowUp(b)-needsFollowUp(a))||(b.last_contact||b.date_contacted||"").localeCompare(a.last_contact||a.date_contacted||"")||(a.name||"").localeCompare(b.name||"");
+  const sc=STAGES.map(st=>active("outreach").filter(o=>stageOf(o)===st).length);
+  const groups=[["Replied","Replied","They wrote back"],["Accepted","Accepted","Connected, waiting on a reply to your message"],["Request sent","Requests sent","Pending on LinkedIn"]];
+  const body=groups.map(([st,label,hint])=>{const g=rows.filter(o=>stageOf(o)===st).sort(by);return `<h3 class="label" id="stage-${st.replace(/\s/g,"-")}">${label} · ${g.length}<span class="hint">${hint}</span></h3><div class="list">${g.map(outRow).join("")||`<div class="empty">${q?"No matches.":"No one here yet."}</div>`}</div>`}).join("");
+  $("#p-outreach").innerHTML=`<div class="sec-head"><h2>Outreach</h2>${addBtn("outreach")}</div>
+    ${funnel(sc)}
+    <div class="toolbar" style="margin-top:12px"><input class="search" id="out-search" type="search" placeholder="Search name or org" value="${esc(ui.outQuery)}" aria-label="Search contacts"><span class="note">"Nudge" = accepted 7+ days ago with no reply.</span><span class="spacer"></span>${archToggle("outreach")}</div>
+    ${L||body}`;
+}
+
+function orgCard(o){
+  return `<div class="org ${o.archived?"dim":""}">
+    <div class="hd"><button class="title" style="font-weight:700;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--ink)" data-edit="orgs:${esc(o.id)}">${esc(o.org)}</button>
+    <span>${o.new_posting_flag?`<span class="pill new">New posting</span>`:""}${o.archived?` <span class="pill s-Archived">Archived</span>`:""}</span></div>
+    ${o.why_it_fits?`<div class="kv"><b>Why it fits</b>${esc(o.why_it_fits)}</div>`:""}
+    ${o.current_status?`<div class="kv"><b>Status</b>${esc(o.current_status)}</div>`:""}
+    ${o.notes?`<div class="kv"><b>Notes</b>${esc(o.notes)}</div>`:""}
+    <div class="ft">${o.check_back?`<span class="pill">Check: ${esc(o.check_back)}</span>`:""}${link(o.careers_url,"Careers")}</div></div>`;
+}
+function renderOrgs(){
+  const L=loading("orgs");const rows=state.orgs.filter(o=>ui.showArch.orgs||!o.archived).sort((a,b)=>(!!b.new_posting_flag-!!a.new_posting_flag)||(a.org||"").localeCompare(b.org||""));
+  const group=(t,label)=>{const g=rows.filter(o=>String(o.tier)===t);return g.length?`<h3 class="label">${label} · ${g.length}</h3><div class="org-grid">${g.map(orgCard).join("")}</div>`:""};
+  $("#p-orgs").innerHTML=`<div class="sec-head"><h2>Target Orgs</h2>${addBtn("orgs")}</div>
+    <div class="toolbar"><span class="spacer"></span>${archToggle("orgs")}</div>
+    ${L||(group("1","Tier 1")+group("2","Tier 2")+group("pipeline","Pipeline programs")||`<div class="list"><div class="empty">No target orgs yet.</div></div>`)}`;
+}
+
+function renderResources(){
+  const L=loading("resources");const rows=state.resources.filter(r=>ui.showArch.resources||!r.archived);
+  const types=["event","job board","newsletter","program"];
+  const labels={"event":"Events","job board":"Job boards","newsletter":"Newsletters","program":"Programs"};
+  const row=r=>`<div class="row ${r.archived||(r.type==="event"&&r.date&&r.date<today())?"dim":""}">
+    <button class="title" data-edit="resources:${esc(r.id)}">${esc(r.name)}</button>
+    <div class="side">${r.date?`<span class="when ${whenClass(r.date)}">${esc(r.date)}</span>`:""}</div>
+    <div class="meta">${link(r.url,"Open")}${r.date?`<span>${whenLabel(r.date)}</span>`:""}</div>
+    ${r.notes?`<div class="notes">${esc(r.notes)}</div>`:""}</div>`;
+  const body=types.map(t=>{const g=rows.filter(r=>r.type===t).sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(a.name||"").localeCompare(b.name||""));return g.length?`<h3 class="label">${labels[t]}</h3><div class="list">${g.map(row).join("")}</div>`:""}).join("");
+  const other=rows.filter(r=>!types.includes(r.type));
+  $("#p-resources").innerHTML=`<div class="sec-head"><h2>Resources &amp; Events</h2>${addBtn("resources")}</div>
+    <div class="toolbar"><span class="spacer"></span>${archToggle("resources")}</div>
+    ${L||(body+(other.length?`<h3 class="label">Other</h3><div class="list">${other.map(row).join("")}</div>`:"")||`<div class="list"><div class="empty">Nothing saved yet.</div></div>`)}`;
+}
+
+function dlRow(d){
+  const past=d.date&&d.date<today();
+  return `<div class="row dl-row ${past||d.archived?"dim":""}">
+    <div class="dl-date">${esc(d.date||"—")}</div>
+    <button class="title" data-edit="deadlines:${esc(d.id)}">${esc(d.item)}</button>
+    <div class="side"><span class="when ${whenClass(d.date)}">${whenLabel(d.date)}</span></div>
+    <div class="meta">${d.type?`<span class="pill">${esc(d.type)}</span>`:""}${d.archived?`<span class="pill s-Archived">Archived</span>`:""}</div>
+    ${d.notes?`<div class="notes">${esc(d.notes)}</div>`:""}</div>`;
+}
+function renderDeadlines(){
+  const L=loading("deadlines");const t=today();const rows=state.deadlines.filter(d=>ui.showArch.deadlines||!d.archived);
+  const up=rows.filter(d=>d.date&&d.date>=t).sort((a,b)=>a.date.localeCompare(b.date));
+  const past=rows.filter(d=>!d.date||d.date<t).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  $("#p-deadlines").innerHTML=`<div class="sec-head"><h2>Deadlines</h2>${addBtn("deadlines")}</div>
+    <div class="toolbar"><span class="spacer"></span>${archToggle("deadlines")}</div>
+    ${L||`<h3 class="label">Upcoming</h3><div class="list">${up.map(dlRow).join("")||`<div class="empty">No upcoming deadlines.</div>`}</div>
+    ${past.length?`<h3 class="label">Past</h3><div class="list">${past.map(dlRow).join("")}</div>`:""}`}`;
+}
+
+function renderCerts(){
+  const L=loading("certs");const rows=state.certs.filter(c=>ui.showArch.certs||!c.archived);
+  const order=["In progress","Not started","Completed"];
+  const cls={"In progress":"s-Interviewing","Not started":"","Completed":"ok"};
+  const row=c=>`<div class="row ${c.archived?"dim":""}">
+    <button class="title" data-edit="certs:${esc(c.id)}">${esc(c.name)} <span class="role">${c.provider?"· "+esc(c.provider):""}</span></button>
+    <div class="side"><span class="pill dot ${cls[c.status]||""}">${esc(c.status||"Not started")}</span></div>
+    <div class="meta">${c.progress?`<span>${esc(c.progress)}</span>`:""}${c.target_date?`<span>Target <span class="mono">${esc(c.target_date)}</span></span>`:""}${link(c.url,"Course")}</div>
+    ${c.notes?`<div class="notes">${esc(c.notes)}</div>`:""}</div>`;
+  const body=order.map(st=>{const g=rows.filter(c=>(c.status||"Not started")===st);return g.length?`<h3 class="label">${st}</h3><div class="list">${g.map(row).join("")}</div>`:""}).join("");
+  $("#p-certs").innerHTML=`<div class="sec-head"><h2>Skills &amp; Certs</h2>${addBtn("certs")}</div>
+    <div class="toolbar"><span class="spacer"></span>${archToggle("certs")}</div>
+    ${L||body||`<div class="list"><div class="empty">No certifications yet.</div></div>`}`;
+}
+
+// ---------- calendar ----------
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const dow=s=>DOW[new Date(toDay(s)*864e5).getUTCDay()];
+const mdy=s=>{const [y,m,d]=s.split("-");return `${+m}/${+d}`};
+function fmtT(t){if(!t)return "";const [H,M]=t.split(":").map(Number);const ap=H>=12?"pm":"am";const h=((H+11)%12)+1;return M?`${h}:${String(M).padStart(2,"0")}${ap}`:`${h}${ap}`}
+const evSort=(a,b)=>(a.date||"").localeCompare(b.date||"")||((a.start||"99")).localeCompare(b.start||"99")||(a.title||"").localeCompare(b.title||"");
+function eventsBetween(from,to){return active("events").filter(e=>e.date&&e.date>=from&&e.date<=to&&(!ui.calKinds||ui.calKinds.includes(e.kind))).sort(evSort)}
+function evChip(e){return `<button class="ev ${KIND_CLS[e.kind]||""}" data-edit="events:${esc(e.id)}" title="${esc((e.start?fmtT(e.start)+" ":"")+e.title)}">${e.start?`<span class="t">${fmtT(e.start)}</span>`:""}${esc(e.title)}</button>`}
+function weekStrip(start,max){
+  const t=today();let cells="";
+  for(let i=0;i<7;i++){const d=plusDays(start,i);const evs=eventsBetween(d,d);const shown=evs.slice(0,max);
+    cells+=`<div class="day ${d===t?"today":""}"><div class="dh2"><span>${d===t?"Today":dow(d)}</span><span class="dn">${mdy(d)}</span></div>${shown.map(evChip).join("")}${evs.length>max?`<span class="more">+${evs.length-max} more</span>`:""}</div>`}
+  return `<div class="week">${cells}</div>`;
+}
+function agRow(e){
+  return `<div class="row ag-row">
+    <div class="ag-time">${e.start?fmtT(e.start)+(e.end?"–"+fmtT(e.end):""):"all day"}</div>
+    <button class="title" data-edit="events:${esc(e.id)}"><span class="kdot ${KIND_CLS[e.kind]||""}"></span> ${esc(e.title)}</button>
+    <div class="side"><span class="pill">${esc(e.kind||"")}</span></div>
+    <div class="meta">${e.where?(safeUrl(e.where)?link(e.where,"Join"):`<span>${esc(e.where)}</span>`):""}${e.calendar?`<span>${esc(e.calendar)}</span>`:""}</div>
+    ${e.notes?`<div class="notes">${esc(e.notes)}</div>`:""}</div>`;
+}
+function agenda(from,to){
+  const evs=eventsBetween(from,to);if(!evs.length)return `<div class="list"><div class="empty">Nothing on the calendar in this range.</div></div>`;
+  let out="",cur="";const t=today();
+  for(const e of evs){if(e.date!==cur){cur=e.date;out+=`<div class="ag-day ${cur===t?"is-today":""}">${cur===t?"Today · ":""}${dow(cur)} ${mdy(cur)} <span style="font-weight:400;text-transform:none;letter-spacing:0">${whenLabel(cur)!=="today"?"· "+whenLabel(cur):""}</span></div>`}out+=agRow(e)}
+  return `<div class="list">${out}</div>`;
+}
+function kindLegend(){return `<div class="toolbar">${EVENT_KINDS.map(k=>{const on=!ui.calKinds||ui.calKinds.includes(k);const n=active("events").filter(e=>e.kind===k&&e.date>=today()).length;return `<button class="chip" data-kind="${k}" aria-pressed="${on&&!!ui.calKinds}"><span class="kdot ${KIND_CLS[k]}"></span> ${k}<span class="c">${n}</span></button>`}).join("")}${ui.calKinds?`<button class="qa quiet" data-kind="*">Show all</button>`:""}</div>`}
+function renderEvents(){
+  const L=loading("events");const t=today();
+  $("#p-events").innerHTML=`<div class="sec-head"><h2>Calendar</h2>${addBtn("events")}</div>
+    <p class="note" style="margin:0 0 10px">Interviews, coffee chats, recruiting events, club chats and assignment due dates, pulled from your NYU + personal calendars and the Fall 26 assignment tracker. Classes are left out.</p>
+    ${kindLegend()}
+    ${L||`<h3 class="label">Next 7 days</h3>${weekStrip(t,6)}<h3 class="label">Following 7 days</h3>${weekStrip(plusDays(t,7),6)}
+    <h3 class="label">Agenda · next 30 days</h3>${agenda(t,plusDays(t,30))}`}`;
+}
+
+// ---------- to-do ----------
+const PRI={High:0,Medium:1,Low:2};
+const todoOpen=r=>!r.archived&&(r.status||"To do")!=="Done";
+const todoSort=(a,b)=>((a.due||"9999")).localeCompare(b.due||"9999")||(PRI[a.priority]??1)-(PRI[b.priority]??1)||(a.task||"").localeCompare(b.task||"");
+function tdRow(r){
+  const done=(r.status||"To do")==="Done";const late=!done&&r.due&&r.due<today();
+  return `<div class="row td-row ${done?"done":""} ${r.archived?"dim":""}">
+    <input type="checkbox" class="td-check" data-todo="${esc(r.id)}" ${done?"checked":""} ${canWrite()?"":"disabled"} aria-label="Mark ${esc(r.task)} done">
+    <button class="title" data-edit="todos:${esc(r.id)}">${esc(r.task)}</button>
+    <div class="side">${r.priority?`<span class="pill pri-${esc(r.priority)}">${esc(r.priority)}</span>`:""}${r.status==="In progress"?`<span class="pill info">In progress</span>`:""}</div>
+    <div class="meta">${r.due?`<span class="when ${done?"":late?"urgent":whenClass(r.due)}">Due <span class="mono">${esc(r.due)}</span> · ${late?"overdue":whenLabel(r.due)}</span>`:`<span>No due date</span>`}${r.related?`<span>${esc(r.related)}</span>`:""}</div>
+    ${r.notes?`<div class="notes">${esc(r.notes)}</div>`:""}</div>`;
+}
+function renderTodos(){
+  const L=loading("todos");const rows=state.todos.filter(r=>ui.showArch.todos||!r.archived);
+  const open=rows.filter(r=>(r.status||"To do")!=="Done").sort(todoSort);const done=rows.filter(r=>r.status==="Done").sort((a,b)=>(b.updated_at||"").localeCompare(a.updated_at||""));
+  const t=today();const wk=plusDays(t,7);
+  const g1=open.filter(r=>r.due&&r.due<=wk),g2=open.filter(r=>!r.due||r.due>wk);
+  $("#p-todos").innerHTML=`<div class="sec-head"><h2>To-Do</h2>${addBtn("todos")}</div>
+    ${canWrite()?`<form class="quickadd" id="td-quick"><input id="td-q-task" placeholder="Add a to-do and press Enter" aria-label="New to-do"><input id="td-q-due" type="date" aria-label="Due date"><button class="btn primary" type="submit">Add</button></form>`:""}
+    <div class="toolbar"><label class="toggle"><input type="checkbox" id="td-done" ${ui.todoShowDone?"checked":""}> Show done (${done.length})</label><span class="spacer"></span>${archToggle("todos")}</div>
+    ${L||`<h3 class="label">This week · ${g1.length}</h3><div class="list">${g1.map(tdRow).join("")||`<div class="empty">Nothing due in the next 7 days.</div>`}</div>
+    <h3 class="label">Later / no date · ${g2.length}</h3><div class="list">${g2.map(tdRow).join("")||`<div class="empty">Nothing here.</div>`}</div>
+    ${ui.todoShowDone&&done.length?`<h3 class="label">Done</h3><div class="list">${done.map(tdRow).join("")}</div>`:""}`}`;
+}
+async function toggleTodo(id,checked,el){
+  const r=state.todos.find(x=>x.id===id);if(!r||!canWrite())return;const prev=r.status||"To do";
+  el.disabled=true;
+  try{await db.doc("todos/"+id).update({status:checked?"Done":"To do",updated_at:new Date().toISOString()});
+    toast(checked?`Done: ${r.task}`:`Reopened: ${r.task}`,async()=>{try{await db.doc("todos/"+id).update({status:prev,updated_at:new Date().toISOString()});toast("Undone")}catch(e){toast("Couldn't undo.")}});
+  }catch(e){el.disabled=false;el.checked=!checked;toast("Couldn't save right now. Try again in a moment.")}
+}
+function overviewWidgets(){
+  const t=today();const open=active("todos").filter(todoOpen).sort(todoSort);
+  const cal=loaded.events?weekStrip(t,4):`<div class="list"><div class="empty">Loading…</div></div>`;
+  const td=loaded.todos?`<div class="list">${open.slice(0,6).map(tdRow).join("")||`<div class="empty">All clear.</div>`}</div>${open.length>6?`<p class="note"><a href="#todos" data-goto-tab="todos">See all ${open.length} →</a></p>`:""}`:`<div class="list"><div class="empty">Loading…</div></div>`;
+  const pin=state.applications.filter(a=>a.pinned&&!["Closed","Rejected"].includes(a.status)).sort((a,b)=>(a.deadline||"9").localeCompare(b.deadline||"9"));
+  const pinHtml=pin.length?`<h3 class="label">Apply next · pinned<span class="hint"><a href="#applications" data-goto-tab="applications">all jobs →</a></span></h3><div class="list">${pin.map(appRow).join("")}</div>`:"";
+  return `${pinHtml}<h3 class="label">This week<span class="hint"><a href="#events" data-goto-tab="events">full calendar →</a></span></h3>${cal}
+    <h3 class="label">To-do · ${open.length} open<span class="hint"><a href="#todos" data-goto-tab="todos">all to-dos →</a></span></h3>${td}`;
+}
+
+function render(){
+  $("#today").textContent=today();
+  COLS.forEach(c=>{const n=c==="applications"?state[c].filter(a=>a.status!=="Closed").length:c==="todos"?state.todos.filter(todoOpen).length:c==="events"?active("events").filter(e=>e.date>=today()&&e.date<=plusDays(today(),7)).length:active(c).length;$("#n-"+c).textContent=loaded[c]?n:""});
+  renderOverview();renderTodos();renderEvents();renderApplications();renderOutreach();renderOrgs();renderResources();renderDeadlines();renderCerts();
+}
+
+// ---------- quick moves ----------
+async function moveApp(id,to,btn){
+  const a=state.applications.find(r=>r.id===id);if(!a||!canWrite())return;
+  const prev={status:a.status||"Saved",last_update:a.last_update||"",date_applied:a.date_applied||""};
+  const patch={status:to,last_update:today(),updated_at:new Date().toISOString()};
+  if(to==="Applied"&&!a.date_applied)patch.date_applied=today();
+  if(btn)btn.disabled=true;
+  try{await db.doc("applications/"+id).update(patch);
+    const verb={Applied:"Moved to Applied",Closed:"Moved to Closed",Saved:"Back in Saved"}[to]||("Marked "+to);
+    toast(`${verb}: ${a.org}`,async()=>{try{await db.doc("applications/"+id).update(Object.assign({},prev,{updated_at:new Date().toISOString()}));toast("Undone")}catch(e){toast("Couldn't undo. Edit the job to fix it.")}});
+  }catch(e){if(btn)btn.disabled=false;toast("Couldn't save right now. Try again in a moment.")}
+}
+async function moveStage(id,to,btn){
+  const o=state.outreach.find(r=>r.id===id);if(!o||!canWrite())return;
+  const prev={stage:stageOf(o),replied:o.replied||"no",last_contact:o.last_contact||""};
+  const patch={stage:to,replied:to==="Replied"?"yes":"no",last_contact:today(),updated_at:new Date().toISOString()};
+  if(btn)btn.disabled=true;
+  try{await db.doc("outreach/"+id).update(patch);
+    toast(`${o.name}: ${to}`,async()=>{try{await db.doc("outreach/"+id).update(Object.assign({},prev,{updated_at:new Date().toISOString()}));toast("Undone")}catch(e){toast("Couldn't undo. Edit the contact to fix it.")}});
+  }catch(e){if(btn)btn.disabled=false;toast("Couldn't save right now. Try again in a moment.")}
+}
+
+// ---------- events ----------
+document.addEventListener("click",e=>{
+  const t=e.target;
+  const mv=t.closest("[data-move]");if(mv){moveApp(mv.dataset.move,mv.dataset.to,mv);return}
+  const sm=t.closest("[data-stage-move]");if(sm){moveStage(sm.dataset.stageMove,sm.dataset.to,sm);return}
+  const ty=t.closest("[data-type]");if(ty){ui.appType=ty.dataset.type;renderApplications();return}
+  const f=t.closest("[data-filter]");if(f){ui.appFilter=f.dataset.filter;renderApplications();return}
+  const gt=t.closest("[data-goto-tab]");if(gt){e.preventDefault();setTab(gt.dataset.gotoTab,true);window.scrollTo({top:0});return}
+  const kd=t.closest("[data-kind]");if(kd){const k=kd.dataset.kind;if(k==="*"||(ui.calKinds&&ui.calKinds.length===1&&ui.calKinds[0]===k))ui.calKinds=null;else{const cur=ui.calKinds||[];ui.calKinds=cur.includes(k)?cur.filter(x=>x!==k):[...cur,k];if(!ui.calKinds.length)ui.calKinds=null}renderEvents();return}
+  const g=t.closest("[data-goto-status]");if(g){ui.appFilter=g.dataset.gotoStatus;renderApplications();setTab("applications",true);window.scrollTo({top:0});return}
+  const gs=t.closest("[data-goto-stage]");if(gs){e.preventDefault();setTab("outreach",true);const el=document.getElementById("stage-"+gs.dataset.gotoStage.replace(/\s/g,"-"));if(el)el.scrollIntoView({block:"start"});return}
+  if(t.closest("#sort-toggle")){ui.appSortDesc=!ui.appSortDesc;renderApplications();return}
+  if(t.closest("#mark-check")){markChecked();return}
+  const a=t.closest("[data-add]");if(a){openForm(a.dataset.add,null);return}
+  const ed=t.closest("[data-edit]");if(ed){const i=ed.dataset.edit.indexOf(":");openForm(ed.dataset.edit.slice(0,i),ed.dataset.edit.slice(i+1));return}
+});
+document.addEventListener("change",e=>{const tc=e.target.closest("[data-todo]");if(tc){toggleTodo(tc.dataset.todo,tc.checked,tc);return}if(e.target.id==="td-done"){ui.todoShowDone=e.target.checked;renderTodos();return}const a=e.target.closest("[data-arch]");if(a){ui.showArch[a.dataset.arch]=a.checked;render()}});
+document.addEventListener("input",e=>{if(e.target.id==="out-search"){ui.outQuery=e.target.value;const pos=e.target.selectionStart;renderOutreach();const s=$("#out-search");s.focus();try{s.setSelectionRange(pos,pos)}catch(x){}}});
+
+document.addEventListener("submit",async e=>{if(e.target.id!=="td-quick")return;e.preventDefault();const task=$("#td-q-task").value.trim();if(!task||!canWrite())return;const due=$("#td-q-due").value;const now=new Date().toISOString();
+  try{await db.collection("todos").add({task,due,priority:"Medium",status:"To do",related:"",notes:"",archived:false,created_at:now,updated_at:now});toast("Added")}catch(err){toast("Couldn't save right now. Try again in a moment.")}});
+let undoFn=null;
+function toast(msg,undo){const el=$("#toast");$("#toast-msg").textContent=msg;undoFn=undo||null;$("#toast-undo").hidden=!undo;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{el.hidden=true;undoFn=null},undo?6000:2400)}
+$("#toast-undo").addEventListener("click",()=>{const f=undoFn;undoFn=null;$("#toast").hidden=true;if(f)f()});
+function showAlert(msg){const el=$("#alert");el.textContent=msg;el.hidden=!msg}
+
+// ---------- form ----------
+let editing=null;
+function openForm(col,id){
+  const sch=SCHEMA[col];const rec=id?state[col].find(r=>r.id===id):null;if(id&&!rec)return;
+  editing={col,id,rec};
+  const dis=!canWrite();
+  const defaults={status:col==="certs"?"Not started":col==="todos"?"To do":"Saved",priority:"Medium",kind:"Coffee chat",calendar:"Dashboard only",stage:"Request sent",job_type:ui.appType==="All"?"Full-time":ui.appType,tier:"2",type:sch.fields.find(f=>f[0]==="type")?.[3].opts[0],last_update:today()};
+  const valOf=(k)=>{if(!rec)return defaults[k]??"";if(col==="applications"&&k==="job_type")return jobType(rec);if(col==="outreach"&&k==="stage")return stageOf(rec);return rec[k]};
+  $("#dlg-title").textContent=(id?(dis?"View ":"Edit "):"Add ")+sch.one;
+  $("#dlg-body").innerHTML=sch.fields.map(([k,label,type,o={}])=>{
+    const v=valOf(k);const fid="f_"+col+"_"+k;const cls="field"+(o.half?" half":"")+(type==="checkbox"?" check":"");
+    if(type==="checkbox")return `<div class="${cls}"><input type="checkbox" id="${fid}" data-k="${k}" ${v?"checked":""} ${dis?"disabled":""}><label for="${fid}">${label}</label></div>`;
+    if(type==="select")return `<div class="${cls}"><label for="${fid}">${label}</label><select id="${fid}" data-k="${k}" ${dis?"disabled":""}>${o.opts.map(x=>`<option value="${esc(x)}" ${String(v??"")===x?"selected":""}>${x===""?"—":esc(x)}</option>`).join("")}</select></div>`;
+    if(type==="textarea")return `<div class="${cls}"><label for="${fid}">${label}</label><textarea id="${fid}" data-k="${k}" ${dis?"readonly":""}>${esc(v)}</textarea></div>`;
+    return `<div class="${cls}"><label for="${fid}">${label}${o.req?" *":""}</label><input id="${fid}" type="${type}" data-k="${k}" value="${esc(v)}" ${o.req?"required":""} ${dis?"readonly":""}></div>`;
+  }).join("");
+  $("#dlg-note").textContent=dis?"Read-only in this view":(col==="applications"?"Mark as Closed instead of deleting.":"Archive instead of deleting.");
+  $("#dlg-save").hidden=dis;
+  $("#dlg").showModal();
+}
+$("#dlg-cancel").addEventListener("click",()=>$("#dlg").close());
+$("#dlg-form").addEventListener("submit",async e=>{
+  e.preventDefault();if(!editing||!db)return;
+  const {col,id,rec}=editing;const out={};let missing=null;
+  $("#dlg-body").querySelectorAll("[data-k]").forEach(el=>{const k=el.dataset.k;out[k]=el.type==="checkbox"?el.checked:el.value.trim();if(el.required&&!out[k]&&!missing)missing=el});
+  if(missing){missing.focus();toast("Fill in the required fields");return}
+  if(col==="applications"&&rec){const changed=Object.keys(out).some(k=>k!=="last_update"&&String(rec[k]??"")!==String(out[k]));if(changed&&out.last_update===(rec.last_update||""))out.last_update=today()}
+  if(col==="applications"&&out.status==="Applied"&&!out.date_applied)out.date_applied=today();
+  if(col==="outreach")out.replied=out.stage==="Replied"?"yes":"no";
+  const now=new Date().toISOString();
+  const data=Object.assign({},rec||{},out,{updated_at:now});delete data.id;if(!rec)data.created_at=now;
+  const btn=$("#dlg-save");btn.disabled=true;
+  try{ if(id)await db.doc(col+"/"+id).set(data); else await db.collection(col).add(data);
+    $("#dlg").close();toast("Saved");
+  }catch(err){ if(err&&err.code==="invalid_argument"){toast("Couldn't save: check the fields and try again")}else{toast("Couldn't save right now. Try again in a moment.")} }
+  finally{btn.disabled=false}
+});
+
+async function markChecked(){
+  if(!db)return;const cur=state.settings||{};
+  try{await db.doc("settings/main").set(Object.assign({},cur,{last_reply_check:today(),updated_at:new Date().toISOString()}));toast("Reply check logged for "+today())}
+  catch(e){toast("Couldn't save right now. Try again in a moment.")}
+}
+
+// ---------- standalone storage ----------
+// Outside claude.ai there is no shared db, so mimic the small slice of its API
+// this page uses and keep everything in localStorage.
+const LOCAL_KEY="jobhunt-dashboard-v1";
+function localDb(){
+  let data;
+  try{data=JSON.parse(localStorage.getItem(LOCAL_KEY)||"{}")||{};localStorage.setItem(LOCAL_KEY,JSON.stringify(data))}catch(e){return null}
+  const subs=[];
+  const save=()=>{try{localStorage.setItem(LOCAL_KEY,JSON.stringify(data))}catch(e){}subs.forEach(f=>f())};
+  const coll=c=>data[c]||(data[c]={});
+  const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const listen=f=>{subs.push(f);f()};
+  return {
+    collection:c=>({
+      add:async d=>{const id=newId();coll(c)[id]=Object.assign({},d);save();return {id}},
+      onSnapshot:cb=>listen(()=>cb({docs:Object.entries(coll(c)).map(([id,v])=>({id,data:()=>Object.assign({},v)}))}))
+    }),
+    doc:path=>{const i=path.lastIndexOf("/"),c=path.slice(0,i),id=path.slice(i+1);return {
+      set:async d=>{coll(c)[id]=Object.assign({},d);save()},
+      update:async d=>{if(!coll(c)[id])throw Object.assign(new Error("not found"),{code:"not_found"});Object.assign(coll(c)[id],d);save()},
+      onSnapshot:cb=>listen(()=>{const v=coll(c)[id];cb({exists:!!v,data:()=>Object.assign({},v||{})})})
+    }},
+    exportJSON:()=>JSON.stringify(data,null,2),
+    importJSON:text=>{const o=JSON.parse(text);if(!o||typeof o!=="object"||Array.isArray(o))throw new Error("bad file");data=o;save()}
+  };
+}
+$("#export-json").addEventListener("click",()=>{if(!db||!db.exportJSON)return;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([db.exportJSON()],{type:"application/json"}));a.download=`jobhunt-export-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+$("#import-json").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f||!db||!db.importJSON)return;if(!confirm("Replace everything in this browser with the contents of "+f.name+"?"))return;try{db.importJSON(await f.text());toast("Imported "+f.name)}catch(err){toast("That file isn't a dashboard export.")}});
+
+// ---------- data ----------
+render();
+(window.claude&&window.claude.use?window.claude.use("db"):Promise.resolve(null)).then(d=>{
+  if(!d){d=localDb();if(!d){unavailable=true;showAlert("Browser storage is blocked here, so the dashboard can't save. Try a normal (non-private) window.");render();return}
+    showAlert("Standalone mode: records are saved in this browser only. Use Export data to back them up.");$("#local-tools").hidden=false}
+  db=d;
+  const onErr=e=>{if(e&&(e.code==="revoked"||e.code==="not_granted")){readOnly=true;showAlert("This view can no longer load dashboard data.");render()}};
+  COLS.forEach(c=>db.collection(c).onSnapshot(s=>{state[c]=s.docs.map(x=>Object.assign({},x.data(),{id:x.id}));loaded[c]=true;render()},onErr));
+  db.doc("settings/main").onSnapshot(s=>{state.settings=s.exists?s.data():{};render()},onErr);
+}).catch(()=>{unavailable=true;render()});
+})();
+</script>
+
+</body></html>
